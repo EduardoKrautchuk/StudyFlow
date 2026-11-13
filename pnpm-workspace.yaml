@@ -1,0 +1,5 @@
+allowBuilds:
+  '@firebase/util': false
+  protobufjs: false
+minimumReleaseAgeExclude:
+  - expo@58.0.25
