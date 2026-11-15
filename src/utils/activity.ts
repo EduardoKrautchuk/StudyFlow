@@ -116,3 +116,18 @@ export function filterActivities(
   const sorted = [...filtered].sort(compareByDueDate);
   return filters.ascending ? sorted : sorted.reverse();
 }
+
+export function joinWithAnd(parts: string[]): string {
+  if (parts.length <= 1) {
+    return parts.join('');
+  }
+  return `${parts.slice(0, -1).join(', ')} e ${parts[parts.length - 1]}`;
+}
+
+export function groupByDueDate(activities: StudyActivity[]): [string, StudyActivity[]][] {
+  const groups = new Map<string, StudyActivity[]>();
+  for (const activity of [...activities].sort(compareByDueDate)) {
+    groups.set(activity.dueDate, [...(groups.get(activity.dueDate) ?? []), activity]);
+  }
+  return [...groups.entries()];
+}
