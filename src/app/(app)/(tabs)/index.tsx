@@ -13,18 +13,17 @@ import { ProgressBar } from '@/components/ProgressBar';
 import { SectionHeader } from '@/components/SectionHeader';
 import { SubjectCard } from '@/components/SubjectCard';
 import { colors, radius, shadow, spacing, typography } from '@/constants/theme';
+import { useAccountMenu } from '@/hooks/use-account-menu';
 import { useAuth } from '@/hooks/use-auth';
 import { useStudyData } from '@/hooks/use-study-data';
 import { setActivityStatus } from '@/services/activities';
-import { getAuthErrorMessage, logout } from '@/services/auth';
 import { getDataErrorMessage } from '@/services/firestore-helpers';
 import type { StudyActivity, Subject } from '@/types/models';
-import { countPendingBySubject, pluralize } from '@/utils/activity';
+import { getStatsFor, getSubjectStats, pluralize } from '@/utils/activity';
 import { withAlpha } from '@/utils/color';
-import { confirmAction } from '@/utils/confirm';
 import { buildDashboardSummary } from '@/utils/dashboard';
 import { formatLongDate, getGreeting, toDateKey } from '@/utils/date';
-import { getFirstName, getInitials } from '@/utils/user';
+import { getFirstName } from '@/utils/user';
 
 const SUBJECT_PREVIEW_LIMIT = 4;
 
@@ -39,36 +38,19 @@ function chunkPairs(items: Subject[]): Subject[][] {
 export default function HomeScreen() {
   const { profile } = useAuth();
   const { subjects, activities, loading, error } = useStudyData();
+  const { initials, openAccountMenu, accountError } = useAccountMenu();
   const [actionError, setActionError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const now = new Date();
   const todayKey = toDateKey(now);
-  const name = profile?.name ?? '';
-  const email = profile?.email ?? '';
-  const firstName = getFirstName(name);
+  const firstName = getFirstName(profile?.name ?? '');
 
   const summary = buildDashboardSummary(activities, todayKey);
   const subjectsById = new Map(subjects.map((subject) => [subject.id, subject]));
-  const pendingBySubject = countPendingBySubject(activities);
+  const subjectStats = getSubjectStats(activities, todayKey);
+  const bannerError = actionError ?? accountError;
   const subjectRows = chunkPairs(subjects.slice(0, SUBJECT_PREVIEW_LIMIT));
-
-  async function handleAccountPress() {
-    const confirmed = await confirmAction({
-      title: 'Sair da conta',
-      message: `Você está conectado como ${email}. Deseja sair?`,
-      confirmLabel: 'Sair',
-      destructive: true,
-    });
-    if (!confirmed) {
-      return;
-    }
-    try {
-      await logout();
-    } catch (logoutError) {
-      setActionError(getAuthErrorMessage(logoutError));
-    }
-  }
 
   async function handleToggleStatus(activity: StudyActivity) {
     if (!profile) {
@@ -87,7 +69,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.root}>
-      <AppHeader initials={getInitials(name, email)} onAvatarPress={handleAccountPress} />
+      <AppHeader initials={initials} onAvatarPress={openAccountMenu} />
 
       {loading ? (
         <LoadingState message="Carregando seus estudos..." />
@@ -108,7 +90,7 @@ export default function HomeScreen() {
           </View>
 
           {error ? <FormAlert title="Não foi possível carregar seus dados" message={error} /> : null}
-          {actionError ? <FormAlert title="Algo deu errado" message={actionError} /> : null}
+          {bannerError ? <FormAlert title="Algo deu errado" message={bannerError} /> : null}
 
           <View style={styles.progressCard}>
             <View style={styles.progressHeader}>
@@ -200,7 +182,7 @@ export default function HomeScreen() {
                       <SubjectCard
                         key={subject.id}
                         subject={subject}
-                        pendingCount={pendingBySubject.get(subject.id) ?? 0}
+                        pendingCount={getStatsFor(subjectStats, subject.id).pending}
                       />
                     ))}
                     {row.length === 1 ? <View style={styles.gridSpacer} /> : null}

@@ -14,6 +14,7 @@ export const colors = {
   warning: '#D97706',
   warningBackground: '#FEF3C7',
   error: '#DC2626',
+  errorPressed: '#B91C1C',
   errorBackground: '#FEE2E2',
   onPrimary: '#FFFFFF',
 } as const;
