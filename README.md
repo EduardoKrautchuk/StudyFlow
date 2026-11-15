@@ -42,7 +42,7 @@ Organizador acadêmico para estudantes universitários, desenvolvido com React N
 |---|---|---|
 | ![Atividades com matéria](docs/screenshots/atividades-com-materia.jpeg) | ![Nova atividade](docs/screenshots/nova-atividade.jpeg) | ![Agenda](docs/screenshots/agenda.jpeg) |
 
-**Vídeo de demonstração:** [assistir no Google Drive](https://drive.google.com/drive/folders/1oJt2Tht9x9JSWeSMISP5Rtwpfo7DyJ9w?usp=sharing)
+**Vídeo de demonstração:** [assistir no Google Drive, recomendado baixar o vídeo para visualizar em melhor definição](https://drive.google.com/drive/folders/1oJt2Tht9x9JSWeSMISP5Rtwpfo7DyJ9w?usp=sharing)
 
 ## Tecnologias
 
@@ -199,16 +199,3 @@ Limitações conhecidas no Expo Go:
 | `pnpm web` | Inicia a versão web |
 | `pnpm lint` | Verifica o código com ESLint |
 | `pnpm typecheck` | Verifica os tipos com TypeScript |
-
-## Apresentação
-
-Roteiro sugerido para a demonstração:
-
-1. Criar uma conta e mostrar a validação dos campos
-2. Cadastrar duas matérias com cores diferentes
-3. Criar atividades de tipos e prioridades diferentes, uma delas com data passada
-4. Mostrar o painel inicial com progresso, urgências e próximas entregas
-5. Na aba Atividades, buscar, filtrar por matéria e status e concluir uma atividade
-6. Na Agenda, navegar entre semanas e abrir os detalhes de uma atividade
-7. Mostrar um lembrete chegando no celular
-8. Sair da conta e entrar novamente para mostrar que os dados continuam salvos
