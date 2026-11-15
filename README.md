@@ -51,7 +51,8 @@ Organizador acadêmico para estudantes universitários, desenvolvido com React N
 - Firebase JavaScript SDK: Authentication e Cloud Firestore
 - AsyncStorage para manter a sessão de login no dispositivo
 - expo-notifications para os lembretes locais
-- Lucide (ícones) e fonte Inter
+- [Lucide](https://lucide.dev/) (ícones, o mesmo conjunto usado pelo [shadcn/ui](https://ui.shadcn.com/)) e fonte Inter
+- Seletores de data e horário inspirados no [Date Picker do shadcn/ui](https://ui.shadcn.com/docs/components/aria/date-picker). O shadcn/ui é feito para web (React + Tailwind), então os componentes foram recriados do zero em React Native com `StyleSheet`, sem bibliotecas de componentes prontos
 - Estilização com `StyleSheet` e estado com `useState`, `useEffect` e hooks próprios
 - pnpm como gerenciador de pacotes
 
