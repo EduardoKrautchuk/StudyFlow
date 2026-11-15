@@ -1,4 +1,4 @@
-import { CalendarDays, Check, CircleAlert, Clock } from 'lucide-react-native';
+import { CalendarDays, Check, CircleAlert, Clock, EllipsisVertical } from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { StatusBadge, type BadgeTone } from '@/components/StatusBadge';
@@ -6,13 +6,16 @@ import { activityTypeLabels, priorityLabels } from '@/constants/activity';
 import { colors, radius, shadow, spacing, typography } from '@/constants/theme';
 import type { ActivityPriority, StudyActivity, Subject } from '@/types/models';
 import { getDueInfo, type DueTone } from '@/utils/activity';
+import { withAlpha } from '@/utils/color';
 
 type ActivityCardProps = {
   activity: StudyActivity;
   subject: Subject | undefined;
   todayKey: string;
   onToggleStatus: (activity: StudyActivity) => void;
+  onOpenMenu?: (activity: StudyActivity) => void;
   disabled?: boolean;
+  variant?: 'compact' | 'detailed';
 };
 
 const priorityTones: Record<ActivityPriority, BadgeTone> = {
@@ -27,14 +30,34 @@ const dueIcons: Record<DueTone, typeof Clock> = {
   normal: CalendarDays,
 };
 
-export function ActivityCard({ activity, subject, todayKey, onToggleStatus, disabled = false }: ActivityCardProps) {
+export function ActivityCard({
+  activity,
+  subject,
+  todayKey,
+  onToggleStatus,
+  onOpenMenu,
+  disabled = false,
+  variant = 'compact',
+}: ActivityCardProps) {
   const completed = activity.status === 'completed';
   const due = getDueInfo(activity, todayKey);
   const DueIcon = dueIcons[due.tone];
   const dueColor = due.tone === 'normal' || completed ? colors.textSecondary : colors.error;
+  const subjectColor = subject?.color ?? colors.textSecondary;
+  const subjectName = subject?.name ?? 'Sem matéria';
+  const detailed = variant === 'detailed';
+
+  const dueLabel = (
+    <View style={styles.metaItem}>
+      <DueIcon size={13} color={dueColor} strokeWidth={2} />
+      <Text style={[styles.metaText, { color: dueColor }, due.tone !== 'normal' && !completed && styles.metaStrong]}>
+        {due.label}
+      </Text>
+    </View>
+  );
 
   return (
-    <View style={[styles.card, due.tone === 'overdue' && styles.cardOverdue]}>
+    <View style={[styles.card, due.tone === 'overdue' && styles.cardOverdue, completed && detailed && styles.cardCompleted]}>
       <Pressable
         accessibilityRole="checkbox"
         accessibilityState={{ checked: completed, disabled }}
@@ -50,25 +73,54 @@ export function ActivityCard({ activity, subject, todayKey, onToggleStatus, disa
         <View style={styles.titleRow}>
           <View style={styles.titleGroup}>
             <Text style={[styles.title, completed && styles.titleCompleted]}>{activity.title}</Text>
-            <StatusBadge label={activityTypeLabels[activity.type]} tone="neutral" bordered={false} />
+            {detailed ? null : (
+              <StatusBadge label={activityTypeLabels[activity.type]} tone="neutral" bordered={false} />
+            )}
           </View>
           <StatusBadge label={priorityLabels[activity.priority]} tone={priorityTones[activity.priority]} />
+          {onOpenMenu ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`Opções da atividade ${activity.title}`}
+              hitSlop={8}
+              onPress={() => onOpenMenu(activity)}
+              style={({ pressed }) => [styles.menu, pressed && styles.menuPressed]}>
+              <EllipsisVertical size={18} color={colors.textSecondary} strokeWidth={2} />
+            </Pressable>
+          ) : null}
         </View>
 
-        <View style={styles.meta}>
-          <View style={styles.metaItem}>
-            <View style={[styles.dot, { backgroundColor: subject?.color ?? colors.textSecondary }]} />
-            <Text style={styles.metaText} numberOfLines={1}>
-              {subject?.name ?? 'Sem matéria'}
-            </Text>
+        {detailed && activity.description ? (
+          <Text style={styles.description} numberOfLines={2}>
+            {activity.description}
+          </Text>
+        ) : null}
+
+        {detailed ? (
+          <View style={styles.meta}>
+            <View style={styles.tags}>
+              <View style={[styles.tag, { backgroundColor: withAlpha(subjectColor, 0.12) }]}>
+                <Text style={[styles.tagText, { color: subjectColor }]} numberOfLines={1}>
+                  {subjectName}
+                </Text>
+              </View>
+              <View style={[styles.tag, styles.typeTag]}>
+                <Text style={styles.typeTagText}>{activityTypeLabels[activity.type]}</Text>
+              </View>
+            </View>
+            {dueLabel}
           </View>
-          <View style={styles.metaItem}>
-            <DueIcon size={13} color={dueColor} strokeWidth={2} />
-            <Text style={[styles.metaText, { color: dueColor }, due.tone !== 'normal' && styles.metaStrong]}>
-              {due.label}
-            </Text>
+        ) : (
+          <View style={styles.meta}>
+            <View style={styles.metaItem}>
+              <View style={[styles.dot, { backgroundColor: subjectColor }]} />
+              <Text style={styles.metaText} numberOfLines={1}>
+                {subjectName}
+              </Text>
+            </View>
+            {dueLabel}
           </View>
-        </View>
+        )}
       </View>
     </View>
   );
@@ -87,8 +139,11 @@ const styles = StyleSheet.create({
     ...shadow,
   },
   cardOverdue: {
-    borderLeftWidth: 3,
+    borderLeftWidth: 4,
     borderLeftColor: colors.error,
+  },
+  cardCompleted: {
+    opacity: 0.75,
   },
   checkbox: {
     width: 20,
@@ -107,12 +162,11 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    gap: 6,
+    gap: spacing.sm,
   },
   titleRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    justifyContent: 'space-between',
     gap: spacing.sm,
   },
   titleGroup: {
@@ -129,12 +183,53 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textDecorationLine: 'line-through',
   },
+  menu: {
+    width: 28,
+    height: 28,
+    marginTop: -spacing.xs,
+    marginRight: -spacing.sm,
+    borderRadius: radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  menuPressed: {
+    backgroundColor: colors.muted,
+  },
+  description: {
+    ...typography.bodyMd,
+    color: colors.textSecondary,
+  },
   meta: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
+    justifyContent: 'space-between',
     columnGap: spacing.md,
-    rowGap: spacing.xs,
+    rowGap: spacing.sm,
+  },
+  tags: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    flexShrink: 1,
+  },
+  tag: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+    borderRadius: 6,
+    maxWidth: 180,
+  },
+  tagText: {
+    ...typography.labelSm,
+    fontSize: 12,
+  },
+  typeTag: {
+    backgroundColor: colors.muted,
+  },
+  typeTagText: {
+    ...typography.labelSm,
+    fontSize: 12,
+    color: colors.textSecondary,
   },
   metaItem: {
     flexDirection: 'row',

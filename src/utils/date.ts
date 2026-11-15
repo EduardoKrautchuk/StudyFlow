@@ -34,11 +34,6 @@ export function addDays(date: Date, days: number): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
 }
 
-export function startOfWeek(date: Date): Date {
-  const day = date.getDay();
-  return addDays(date, day === 0 ? -6 : 1 - day);
-}
-
 export function diffInDays(fromKey: string, toKey: string): number {
   return Math.round((parseDateKey(toKey).getTime() - parseDateKey(fromKey).getTime()) / DAY_IN_MS);
 }
@@ -62,3 +57,29 @@ export function getGreeting(date: Date): string {
   }
   return 'Boa noite';
 }
+
+export function formatDateLabel(key: string): string {
+  const date = parseDateKey(key);
+  return `${WEEKDAYS_SHORT[date.getDay()]}, ${date.getDate()} ${MONTHS_SHORT[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+export function formatMonthTitle(date: Date): string {
+  const month = MONTHS[date.getMonth()];
+  return `${month.charAt(0).toUpperCase()}${month.slice(1)} ${date.getFullYear()}`;
+}
+
+export function startOfMonth(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+export function addMonths(date: Date, months: number): Date {
+  return new Date(date.getFullYear(), date.getMonth() + months, 1);
+}
+
+export function getCalendarDays(month: Date): Date[] {
+  const first = startOfMonth(month);
+  const gridStart = addDays(first, -first.getDay());
+  return Array.from({ length: 42 }, (_, index) => addDays(gridStart, index));
+}
+
+export const WEEKDAY_INITIALS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
