@@ -59,7 +59,7 @@ Organizador acadêmico para estudantes universitários, desenvolvido com React N
 
 | Requisito | Onde está |
 |---|---|
-| Expo executável no Expo Go | `pnpm start` abre direto no modo Expo Go |
+| Expo executável no Expo Go | `pnpm expo start --go --clear` abre direto no modo Expo Go |
 | Mínimo de 4 telas com navegação | 8 telas com Expo Router, abas inferiores e telas de formulário |
 | Componentes reutilizáveis próprios | `src/components` (botões, campos, cards, cabeçalhos, diálogos, calendário) |
 | `useState` e `useEffect` | Todas as telas, além de `src/hooks/use-auth.tsx` e `src/hooks/use-study-data.tsx` |
@@ -96,10 +96,7 @@ Os arquivos `*.native.ts` são usados no Android e no iOS. Os equivalentes sem `
 1. Crie um projeto no [Firebase Console](https://console.firebase.google.com/).
 2. Em **Authentication > Sign-in method**, ative **E-mail/senha**.
 3. Em **Firestore Database**, crie o banco em **modo de produção** (sugestão de local: `southamerica-east1`).
-4. Na aba **Regras** do Firestore, publique regras que:
-   - permitam a cada usuário autenticado ler e escrever apenas em `users/{seu uid}/subjects` e `users/{seu uid}/activities`;
-   - validem os campos das matérias (`name`, `color`, `createdAt`) e das atividades (`title`, `description`, `subjectId`, `type`, `priority`, `status`, `dueDate`, `dueTime`, `createdAt`, `updatedAt`);
-   - bloqueiem qualquer outro caminho do banco.
+4. Na aba **Regras** do Firestore, cole o conteúdo do arquivo [`firestore.rules`](firestore.rules) e clique em **Publicar**. As regras estão explicadas em [Banco de dados](#banco-de-dados).
 5. Em **Configurações do projeto > Seus apps**, registre um app **Web** e copie a configuração.
 6. Copie `.env.example` para `.env` e preencha:
 
@@ -114,6 +111,59 @@ EXPO_PUBLIC_FIREBASE_APP_ID=
 
 O arquivo `.env` está no `.gitignore`. Esses valores são a configuração pública do app web do Firebase, e a segurança dos dados é garantida pelas regras do Firestore. Nunca adicione chaves de conta de serviço ao repositório.
 
+## Banco de dados
+
+Os dados ficam no **Cloud Firestore**, organizados por usuário. Cada pessoa só enxerga o que está dentro do próprio `uid`:
+
+```
+users/
+  {uid}/
+    subjects/
+      {subjectId}
+    activities/
+      {activityId}
+```
+
+### Matéria (`subjects`)
+
+| Campo | Tipo | Exemplo | Observação |
+|---|---|---|---|
+| `name` | texto | `"Banco de Dados"` | obrigatório, até 60 caracteres |
+| `color` | texto | `"#B45336"` | cor no formato `#RRGGBB` |
+| `createdAt` | timestamp | horário do servidor | definido na criação |
+
+### Atividade (`activities`)
+
+| Campo | Tipo | Exemplo | Observação |
+|---|---|---|---|
+| `title` | texto | `"Prova bimestral"` | obrigatório, até 120 caracteres |
+| `description` | texto | `"Capítulos 1 a 4"` | opcional (texto vazio quando não informado), até 1000 caracteres |
+| `subjectId` | texto | `"aB3dE..."` | ID de uma matéria existente do mesmo usuário |
+| `type` | texto | `"exam"` | `exam` (prova), `assignment` (trabalho) ou `task` (tarefa) |
+| `priority` | texto | `"high"` | `low`, `medium` ou `high` |
+| `status` | texto | `"pending"` | `pending` (pendente) ou `completed` (concluída) |
+| `dueDate` | texto | `"2026-11-22"` | data de entrega no formato `AAAA-MM-DD` |
+| `dueTime` | texto ou nulo | `"23:59"` | horário opcional no formato `HH:MM` |
+| `createdAt` | timestamp | horário do servidor | definido na criação |
+| `updatedAt` | timestamp | horário do servidor | atualizado a cada alteração |
+
+### Decisões
+
+- **Datas como texto `AAAA-MM-DD`:** a data de entrega não depende de fuso horário, então uma atividade do dia 22 nunca aparece no dia 21. Esse formato também permite ordenar e comparar datas diretamente.
+- **Horários do servidor** (`serverTimestamp`) em `createdAt` e `updatedAt`, para não depender do relógio do celular.
+- **Tempo real:** o app escuta as coleções com `onSnapshot` (`src/hooks/use-study-data.tsx`), então Início, Matérias, Atividades e Agenda atualizam sozinhas após qualquer alteração.
+- **Exclusão de matéria:** não é permitida enquanto houver atividades vinculadas. O app avisa e pede para excluir as atividades antes.
+
+### Regras de segurança
+
+O arquivo [`firestore.rules`](firestore.rules) contém as regras publicadas no Firebase. Elas garantem que:
+
+- apenas o usuário autenticado dono do `uid` lê, cria, edita e exclui os próprios documentos;
+- cada documento tem somente os campos esperados, com os tipos e valores permitidos;
+- uma atividade só pode apontar para uma matéria que existe;
+- `createdAt` é definido pelo servidor na criação e não pode ser alterado depois;
+- qualquer outro caminho do banco fica bloqueado.
+
 ## Como rodar
 
 ### Pré-requisitos
@@ -127,21 +177,18 @@ O arquivo `.env` está no `.gitignore`. Esses valores são a configuração púb
 
 ```bash
 pnpm install
-pnpm start
+pnpm expo start --go --clear
 ```
 
-`pnpm start` executa `expo start --go`, que já inicia no modo **Expo Go**. Sem o `--go`, o Expo pode iniciar no modo *development build*, e o QR code não abre no Expo Go (nesse caso, aperte `s` no terminal para alternar).
+- `--go` inicia direto no modo **Expo Go**. Sem ele, o Expo pode iniciar no modo *development build*, e o QR code não abre no Expo Go (nesse caso, aperte `s` no terminal para alternar).
+- `--clear` limpa o cache do Metro. Use sempre na primeira execução e depois de alterar o `.env`.
+
+O atalho `pnpm start` executa o mesmo `expo start --go`, sem limpar o cache.
 
 Escaneie o QR code:
 
 - **Android:** pelo próprio app Expo Go, em *Scan QR code*
 - **iOS:** pela câmera do iPhone
-
-Depois de alterar o `.env`, reinicie limpando o cache:
-
-```bash
-pnpm start --clear
-```
 
 ### O celular não conecta?
 
@@ -192,6 +239,7 @@ Limitações conhecidas no Expo Go:
 
 | Comando | Descrição |
 |---|---|
+| `pnpm expo start --go --clear` | Inicia no modo Expo Go limpando o cache (recomendado) |
 | `pnpm start` | Inicia no modo Expo Go |
 | `pnpm start:tunnel` | Inicia no modo Expo Go via túnel (requer `pnpm expo login`) |
 | `pnpm android` | Inicia e abre no emulador Android |
