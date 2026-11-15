@@ -3,7 +3,7 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-nati
 
 import { colors, radius, spacing, typography } from '@/constants/theme';
 
-type AppButtonVariant = 'primary' | 'outline';
+type AppButtonVariant = 'primary' | 'outline' | 'danger';
 
 type AppButtonProps = {
   title: string;
@@ -13,6 +13,7 @@ type AppButtonProps = {
   disabled?: boolean;
   variant?: AppButtonVariant;
   iconPosition?: 'start' | 'end';
+  size?: 'md' | 'sm';
 };
 
 export function AppButton({
@@ -23,9 +24,11 @@ export function AppButton({
   disabled = false,
   variant = 'primary',
   iconPosition = 'end',
+  size = 'md',
 }: AppButtonProps) {
-  const isPrimary = variant === 'primary';
-  const contentColor = isPrimary ? colors.onPrimary : colors.text;
+  const iconSize = size === 'sm' ? 18 : 20;
+  const isFilled = variant !== 'outline';
+  const contentColor = isFilled ? colors.onPrimary : colors.text;
   const isDisabled = disabled || loading;
 
   return (
@@ -36,17 +39,18 @@ export function AppButton({
       onPress={onPress}
       style={({ pressed }) => [
         styles.base,
-        isPrimary ? styles.primary : styles.outline,
-        pressed && (isPrimary ? styles.primaryPressed : styles.outlinePressed),
+        size === 'sm' && styles.small,
+        styles[variant],
+        pressed && styles[`${variant}Pressed`],
         isDisabled && styles.disabled,
       ]}>
       {loading ? (
         <ActivityIndicator color={contentColor} />
       ) : (
         <View style={styles.content}>
-          {Icon && iconPosition === 'start' ? <Icon size={20} color={contentColor} strokeWidth={2} /> : null}
-          <Text style={[styles.title, { color: contentColor }]}>{title}</Text>
-          {Icon && iconPosition === 'end' ? <Icon size={20} color={contentColor} strokeWidth={2} /> : null}
+          {Icon && iconPosition === 'start' ? <Icon size={iconSize} color={contentColor} strokeWidth={2} /> : null}
+          <Text style={[styles.title, size === 'sm' && styles.smallTitle, { color: contentColor }]}>{title}</Text>
+          {Icon && iconPosition === 'end' ? <Icon size={iconSize} color={contentColor} strokeWidth={2} /> : null}
         </View>
       )}
     </Pressable>
@@ -61,11 +65,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: spacing.lg,
   },
+  small: {
+    height: 42,
+    paddingHorizontal: spacing.md + 2,
+  },
   primary: {
     backgroundColor: colors.primary,
   },
   primaryPressed: {
     backgroundColor: colors.primaryPressed,
+  },
+  danger: {
+    backgroundColor: colors.error,
+  },
+  dangerPressed: {
+    backgroundColor: colors.errorPressed,
   },
   outline: {
     backgroundColor: colors.surface,
@@ -85,5 +99,8 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.headlineSm,
+  },
+  smallTitle: {
+    fontSize: 14,
   },
 });

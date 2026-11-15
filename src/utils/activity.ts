@@ -40,14 +40,37 @@ export function compareByDueDate(a: StudyActivity, b: StudyActivity): number {
   return a.title.localeCompare(b.title);
 }
 
-export function countPendingBySubject(activities: StudyActivity[]): Map<string, number> {
-  const counts = new Map<string, number>();
+export type SubjectStats = {
+  total: number;
+  completed: number;
+  pending: number;
+  overdue: number;
+  progress: number;
+};
+
+const emptyStats: SubjectStats = { total: 0, completed: 0, pending: 0, overdue: 0, progress: 0 };
+
+export function getSubjectStats(activities: StudyActivity[], todayKey: string): Map<string, SubjectStats> {
+  const stats = new Map<string, SubjectStats>();
   for (const activity of activities) {
-    if (activity.status === 'pending') {
-      counts.set(activity.subjectId, (counts.get(activity.subjectId) ?? 0) + 1);
+    const current = stats.get(activity.subjectId) ?? { ...emptyStats };
+    current.total += 1;
+    if (activity.status === 'completed') {
+      current.completed += 1;
+    } else {
+      current.pending += 1;
+      if (activity.dueDate < todayKey) {
+        current.overdue += 1;
+      }
     }
+    current.progress = Math.round((current.completed / current.total) * 100);
+    stats.set(activity.subjectId, current);
   }
-  return counts;
+  return stats;
+}
+
+export function getStatsFor(stats: Map<string, SubjectStats>, subjectId: string): SubjectStats {
+  return stats.get(subjectId) ?? emptyStats;
 }
 
 export function pluralize(count: number, singular: string, plural: string): string {

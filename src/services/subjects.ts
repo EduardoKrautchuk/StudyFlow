@@ -1,8 +1,13 @@
 import {
+  addDoc,
   collection,
+  deleteDoc,
+  doc,
   onSnapshot,
   orderBy,
   query,
+  serverTimestamp,
+  updateDoc,
   type QueryDocumentSnapshot,
   type Unsubscribe,
 } from 'firebase/firestore';
@@ -40,4 +45,28 @@ export function subscribeToSubjects(
     },
     onError,
   );
+}
+
+export type SubjectInput = {
+  name: string;
+  color: string;
+};
+
+export async function createSubject(userId: string, input: SubjectInput): Promise<void> {
+  await addDoc(subjectsCollection(userId), {
+    name: input.name.trim(),
+    color: input.color,
+    createdAt: serverTimestamp(),
+  });
+}
+
+export async function updateSubject(userId: string, subjectId: string, input: SubjectInput): Promise<void> {
+  await updateDoc(doc(subjectsCollection(userId), subjectId), {
+    name: input.name.trim(),
+    color: input.color,
+  });
+}
+
+export async function deleteSubject(userId: string, subjectId: string): Promise<void> {
+  await deleteDoc(doc(subjectsCollection(userId), subjectId));
 }

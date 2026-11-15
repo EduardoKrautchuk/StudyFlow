@@ -6,19 +6,24 @@ import { colors, spacing } from '@/constants/theme';
 
 type FormScreenProps = {
   children: ReactNode;
+  header?: ReactNode;
+  centered?: boolean;
 };
 
-export function FormScreen({ children }: FormScreenProps) {
+export function FormScreen({ children, header, centered = true }: FormScreenProps) {
   const insets = useSafeAreaInsets();
+  const topPadding = header ? spacing.xl : insets.top + spacing.xxxl;
 
   return (
     <View style={styles.root}>
+      {header}
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <ScrollView
           style={styles.flex}
           contentContainerStyle={[
             styles.content,
-            { paddingTop: insets.top + spacing.xxxl, paddingBottom: insets.bottom + spacing.xxxl },
+            centered && styles.centered,
+            { paddingTop: topPadding, paddingBottom: insets.bottom + spacing.xxxl },
           ]}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="interactive"
@@ -40,8 +45,10 @@ const styles = StyleSheet.create({
   },
   content: {
     flexGrow: 1,
-    justifyContent: 'center',
     paddingHorizontal: spacing.xxl,
+  },
+  centered: {
+    justifyContent: 'center',
   },
   inner: {
     width: '100%',

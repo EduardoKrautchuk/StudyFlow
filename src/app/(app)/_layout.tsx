@@ -9,6 +9,7 @@ export default function AppLayout() {
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="activity/new" />
+        <Stack.Screen name="subject-form" />
       </Stack>
     </StudyDataProvider>
   );

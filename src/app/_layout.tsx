@@ -14,6 +14,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { LoadingState } from '@/components/LoadingState';
 import { colors } from '@/constants/theme';
 import { AuthProvider, useAuth } from '@/hooks/use-auth';
+import { DialogProvider } from '@/hooks/use-dialog';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -60,10 +61,12 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <StatusBar style="dark" />
-        <RootNavigator />
-      </AuthProvider>
+      <DialogProvider>
+        <AuthProvider>
+          <StatusBar style="dark" />
+          <RootNavigator />
+        </AuthProvider>
+      </DialogProvider>
     </SafeAreaProvider>
   );
 }
