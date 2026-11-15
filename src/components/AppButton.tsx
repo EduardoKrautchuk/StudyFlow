@@ -12,6 +12,7 @@ type AppButtonProps = {
   loading?: boolean;
   disabled?: boolean;
   variant?: AppButtonVariant;
+  iconPosition?: 'start' | 'end';
 };
 
 export function AppButton({
@@ -21,6 +22,7 @@ export function AppButton({
   loading = false,
   disabled = false,
   variant = 'primary',
+  iconPosition = 'end',
 }: AppButtonProps) {
   const isPrimary = variant === 'primary';
   const contentColor = isPrimary ? colors.onPrimary : colors.text;
@@ -42,8 +44,9 @@ export function AppButton({
         <ActivityIndicator color={contentColor} />
       ) : (
         <View style={styles.content}>
+          {Icon && iconPosition === 'start' ? <Icon size={20} color={contentColor} strokeWidth={2} /> : null}
           <Text style={[styles.title, { color: contentColor }]}>{title}</Text>
-          {Icon ? <Icon size={20} color={contentColor} strokeWidth={2} /> : null}
+          {Icon && iconPosition === 'end' ? <Icon size={20} color={contentColor} strokeWidth={2} /> : null}
         </View>
       )}
     </Pressable>
