@@ -8,7 +8,7 @@ export default function AppLayout() {
     <StudyDataProvider>
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="activity/new" />
+        <Stack.Screen name="activity-form" />
         <Stack.Screen name="subject-form" />
       </Stack>
     </StudyDataProvider>

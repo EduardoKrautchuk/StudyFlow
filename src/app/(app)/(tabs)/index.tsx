@@ -95,27 +95,27 @@ export default function HomeScreen() {
           <View style={styles.progressCard}>
             <View style={styles.progressHeader}>
               <View style={styles.progressTexts}>
-                <Text style={styles.cardTitle}>Progresso da semana</Text>
+                <Text style={styles.cardTitle}>Progresso dos próximos 7 dias</Text>
                 <Text style={styles.cardSubtitle}>
-                  {summary.weekTotal === 0
-                    ? 'Nenhuma atividade com entrega nesta semana'
-                    : `${summary.weekCompleted} de ${summary.weekTotal} atividades concluídas`}
+                  {summary.periodTotal === 0
+                    ? 'Nenhuma entrega atrasada ou nos próximos 7 dias'
+                    : `${summary.periodCompleted} de ${summary.periodTotal} atividades concluídas`}
                 </Text>
               </View>
               <View style={styles.percentBadge}>
                 <TrendingUp size={14} color={colors.primary} strokeWidth={2} />
-                <Text style={styles.percentText}>{summary.weekProgress}%</Text>
+                <Text style={styles.percentText}>{summary.periodProgress}%</Text>
               </View>
             </View>
 
-            <ProgressBar progress={summary.weekProgress} />
+            <ProgressBar progress={summary.periodProgress} />
 
             <View style={styles.stats}>
               <View style={[styles.stat, styles.statNeutral]}>
                 <View style={[styles.statDot, { backgroundColor: colors.textSecondary }]} />
                 <View style={styles.statTexts}>
                   <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Restantes</Text>
-                  <Text style={styles.statValue}>{pluralize(summary.weekPending, 'pendente', 'pendentes')}</Text>
+                  <Text style={styles.statValue}>{pluralize(summary.periodPending, 'pendente', 'pendentes')}</Text>
                 </View>
               </View>
               <View style={[styles.stat, styles.statWarning]}>
@@ -164,7 +164,6 @@ export default function HomeScreen() {
             <SectionHeader
               title="Suas matérias"
               count={subjects.length}
-              countVariant="plain"
               actionLabel="Gerenciar"
               onAction={() => router.push('/subjects')}
             />
@@ -192,7 +191,7 @@ export default function HomeScreen() {
             )}
           </View>
 
-          <AppButton title="Nova atividade" icon={Plus} iconPosition="start" onPress={() => router.push('/activity/new')} />
+          <AppButton title="Nova atividade" icon={Plus} iconPosition="start" onPress={() => router.push('/activity-form')} />
         </ScrollView>
       )}
     </View>

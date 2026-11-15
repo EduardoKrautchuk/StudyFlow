@@ -31,3 +31,7 @@ export const SUBJECT_COLORS: readonly string[] = [
 ];
 
 export const SUBJECT_NAME_MAX_LENGTH = 60;
+
+export const ACTIVITY_TITLE_MAX_LENGTH = 120;
+
+export const ACTIVITY_DESCRIPTION_MAX_LENGTH = 1000;

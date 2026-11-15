@@ -1,4 +1,4 @@
-import type { StudyActivity } from '@/types/models';
+import type { StudyActivity, Subject } from '@/types/models';
 import { diffInDays, formatShortDate } from '@/utils/date';
 
 export type DueTone = 'overdue' | 'soon' | 'normal';
@@ -75,4 +75,44 @@ export function getStatsFor(stats: Map<string, SubjectStats>, subjectId: string)
 
 export function pluralize(count: number, singular: string, plural: string): string {
   return `${count} ${count === 1 ? singular : plural}`;
+}
+
+export type StatusFilter = 'all' | 'pending' | 'completed';
+
+export type ActivityFilters = {
+  query: string;
+  status: StatusFilter;
+  subjectId: string | null;
+  ascending: boolean;
+};
+
+function normalizeText(text: string): string {
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
+export function filterActivities(
+  activities: StudyActivity[],
+  subjectsById: Map<string, Subject>,
+  filters: ActivityFilters,
+): StudyActivity[] {
+  const query = normalizeText(filters.query);
+  const filtered = activities.filter((activity) => {
+    if (filters.status !== 'all' && activity.status !== filters.status) {
+      return false;
+    }
+    if (filters.subjectId && activity.subjectId !== filters.subjectId) {
+      return false;
+    }
+    if (!query) {
+      return true;
+    }
+    const subjectName = subjectsById.get(activity.subjectId)?.name ?? '';
+    return normalizeText(activity.title).includes(query) || normalizeText(subjectName).includes(query);
+  });
+  const sorted = [...filtered].sort(compareByDueDate);
+  return filters.ascending ? sorted : sorted.reverse();
 }

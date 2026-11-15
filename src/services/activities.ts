@@ -1,5 +1,7 @@
 import {
+  addDoc,
   collection,
+  deleteDoc,
   doc,
   onSnapshot,
   orderBy,
@@ -13,7 +15,7 @@ import {
 import { ACTIVITY_PRIORITIES, ACTIVITY_STATUSES, ACTIVITY_TYPES } from '@/constants/activity';
 import { db } from '@/services/firebase';
 import { isOneOf, toDate } from '@/services/firestore-helpers';
-import type { ActivityStatus, StudyActivity } from '@/types/models';
+import type { ActivityPriority, ActivityStatus, ActivityType, StudyActivity } from '@/types/models';
 
 function activitiesCollection(userId: string) {
   return collection(db, 'users', userId, 'activities');
@@ -65,4 +67,46 @@ export async function setActivityStatus(userId: string, activityId: string, stat
     status,
     updatedAt: serverTimestamp(),
   });
+}
+
+export type ActivityInput = {
+  title: string;
+  description: string;
+  subjectId: string;
+  type: ActivityType;
+  priority: ActivityPriority;
+  dueDate: string;
+  dueTime: string | null;
+};
+
+function toActivityFields(input: ActivityInput) {
+  return {
+    title: input.title.trim(),
+    description: input.description.trim(),
+    subjectId: input.subjectId,
+    type: input.type,
+    priority: input.priority,
+    dueDate: input.dueDate,
+    dueTime: input.dueTime,
+  };
+}
+
+export async function createActivity(userId: string, input: ActivityInput): Promise<void> {
+  await addDoc(activitiesCollection(userId), {
+    ...toActivityFields(input),
+    status: 'pending',
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function updateActivity(userId: string, activityId: string, input: ActivityInput): Promise<void> {
+  await updateDoc(doc(activitiesCollection(userId), activityId), {
+    ...toActivityFields(input),
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteActivity(userId: string, activityId: string): Promise<void> {
+  await deleteDoc(doc(activitiesCollection(userId), activityId));
 }

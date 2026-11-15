@@ -1,12 +1,11 @@
 import { ChevronRight } from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { colors, spacing, typography } from '@/constants/theme';
 
 type SectionHeaderProps = {
   title: string;
   count?: number;
-  countVariant?: 'badge' | 'plain';
   actionLabel?: string;
   showActionChevron?: boolean;
   onAction?: () => void;
@@ -15,7 +14,6 @@ type SectionHeaderProps = {
 export function SectionHeader({
   title,
   count,
-  countVariant = 'badge',
   actionLabel,
   showActionChevron = false,
   onAction,
@@ -26,15 +24,7 @@ export function SectionHeader({
         <Text style={styles.title} accessibilityRole="header">
           {title}
         </Text>
-        {count !== undefined ? (
-          countVariant === 'badge' ? (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{count}</Text>
-            </View>
-          ) : (
-            <Text style={styles.plainCount}>({count})</Text>
-          )
-        ) : null}
+        {count !== undefined ? <Text style={styles.count}>({count})</Text> : null}
       </View>
       {actionLabel && onAction ? (
         <Pressable accessibilityRole="link" hitSlop={8} onPress={onAction} style={styles.action}>
@@ -68,22 +58,7 @@ const styles = StyleSheet.create({
     fontSize: 19,
     color: colors.text,
   },
-  badge: {
-    minWidth: 24,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.muted,
-    alignItems: 'center',
-  },
-  badgeText: {
-    ...typography.labelSm,
-    fontFamily: typography.labelMd.fontFamily,
-    color: colors.textSecondary,
-  },
-  plainCount: {
+  count: {
     ...typography.bodyMd,
     color: colors.textSecondary,
   },
