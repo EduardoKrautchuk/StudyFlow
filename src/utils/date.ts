@@ -83,3 +83,33 @@ export function getCalendarDays(month: Date): Date[] {
 }
 
 export const WEEKDAY_INITIALS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+
+export function getWeekDays(date: Date): Date[] {
+  const start = addDays(date, -date.getDay());
+  return Array.from({ length: 7 }, (_, index) => addDays(start, index));
+}
+
+export function formatWeekdayShort(date: Date): string {
+  return WEEKDAYS_SHORT[date.getDay()];
+}
+
+export function formatMonthShort(date: Date): string {
+  const month = MONTHS_SHORT[date.getMonth()];
+  return `${month.charAt(0).toUpperCase()}${month.slice(1)} ${date.getFullYear()}`;
+}
+
+export function formatDayHeading(key: string, todayKey: string): string {
+  const date = parseDateKey(key);
+  const full = `${WEEKDAYS[date.getDay()]}, ${date.getDate()} de ${MONTHS[date.getMonth()]}`;
+  const days = diffInDays(todayKey, key);
+  if (days === 0) {
+    return `Hoje • ${full}`;
+  }
+  if (days === 1) {
+    return `Amanhã • ${full}`;
+  }
+  if (days === -1) {
+    return `Ontem • ${full}`;
+  }
+  return full;
+}
