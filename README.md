@@ -42,7 +42,7 @@ Organizador acadêmico para estudantes universitários, desenvolvido com React N
 |---|---|---|
 | ![Atividades com matéria](docs/screenshots/atividades-com-materia.jpeg) | ![Nova atividade](docs/screenshots/nova-atividade.jpeg) | ![Agenda](docs/screenshots/agenda.jpeg) |
 
-**Vídeo de demonstração:** [assistir no Google Drive, recomendado baixar o vídeo para visualizar em melhor definição](https://drive.google.com/drive/folders/1oJt2Tht9x9JSWeSMISP5Rtwpfo7DyJ9w?usp=sharing)
+**Vídeo de demonstração:** [assistir no Google Drive](https://drive.google.com/drive/folders/1oJt2Tht9x9JSWeSMISP5Rtwpfo7DyJ9w?usp=sharing) recomendado baixar o vídeo para visualizar em melhor definição
 
 ## Tecnologias
 
