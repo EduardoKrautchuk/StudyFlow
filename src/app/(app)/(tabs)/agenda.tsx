@@ -131,10 +131,10 @@ export default function AgendaScreen() {
               <CalendarCheck size={20} color={colors.primary} strokeWidth={1.75} />
             </View>
             <View style={styles.summaryTexts}>
-              <Text style={styles.summaryTitle} numberOfLines={1}>
+              <Text style={styles.summaryTitle}>
                 {pluralize(upcoming.length, 'entrega', 'entregas')} nos próximos 7 dias
               </Text>
-              <Text style={styles.summaryText} numberOfLines={1}>
+              <Text style={styles.summaryText}>
                 {upcoming.length === 0 ? 'Nenhuma pendência no período' : `${typeSummary} pendentes`}
               </Text>
             </View>

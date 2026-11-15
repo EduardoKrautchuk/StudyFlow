@@ -34,12 +34,20 @@ export function getAuthErrorMessage(error: unknown): string {
 }
 
 export async function signIn(email: string, password: string): Promise<void> {
+  const startedAt = Date.now();
   await signInWithEmailAndPassword(auth, email.trim(), password);
+  if (__DEV__) {
+    console.log('[auth]', `login em ${Date.now() - startedAt} ms`);
+  }
 }
 
 export async function signUp(name: string, email: string, password: string): Promise<void> {
   const credential = await createUserWithEmailAndPassword(auth, email.trim(), password);
-  await updateProfile(credential.user, { displayName: name.trim() });
+  try {
+    await updateProfile(credential.user, { displayName: name.trim() });
+  } finally {
+    await signOut(auth);
+  }
 }
 
 export async function requestPasswordReset(email: string): Promise<void> {

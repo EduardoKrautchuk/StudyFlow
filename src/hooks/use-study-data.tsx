@@ -28,6 +28,12 @@ export function StudyDataProvider({ children }: { children: ReactNode }) {
     if (!userId) {
       return;
     }
+    const startedAt = Date.now();
+    const logLoaded = (collectionName: string, count: number) => {
+      if (__DEV__) {
+        console.log('[dados]', `${collectionName}: ${count} em ${Date.now() - startedAt} ms`);
+      }
+    };
     const handleError = (subscriptionError: Error) => {
       setError(getDataErrorMessage(subscriptionError));
       setSubjectsLoaded(true);
@@ -36,6 +42,7 @@ export function StudyDataProvider({ children }: { children: ReactNode }) {
     const unsubscribeSubjects = subscribeToSubjects(
       userId,
       (items) => {
+        logLoaded('matérias', items.length);
         setSubjects(items);
         setSubjectsLoaded(true);
       },
@@ -44,6 +51,7 @@ export function StudyDataProvider({ children }: { children: ReactNode }) {
     const unsubscribeActivities = subscribeToActivities(
       userId,
       (items) => {
+        logLoaded('atividades', items.length);
         setActivities(items);
         setActivitiesLoaded(true);
       },

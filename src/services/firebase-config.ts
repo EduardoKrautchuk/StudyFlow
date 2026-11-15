@@ -9,5 +9,4 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
-export const isFirstInit = getApps().length === 0;
-export const app: FirebaseApp = isFirstInit ? initializeApp(firebaseConfig) : getApp();
+export const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();

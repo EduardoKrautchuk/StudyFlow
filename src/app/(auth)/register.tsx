@@ -9,7 +9,7 @@ import { FormAlert } from '@/components/FormAlert';
 import { FormScreen } from '@/components/FormScreen';
 import { colors, radius, shadow, spacing, typography } from '@/constants/theme';
 import { useAuth } from '@/hooks/use-auth';
-import { getAuthErrorMessage, signUp } from '@/services/auth';
+import { getAuthErrorMessage } from '@/services/auth';
 import { hasMinPasswordLength, isStrongPassword, validateEmail, validatePassword } from '@/utils/validation';
 
 type RegisterErrors = {
@@ -36,7 +36,7 @@ function PasswordRule({ label, satisfied }: PasswordRuleProps) {
 }
 
 export default function RegisterScreen() {
-  const { refreshProfile } = useAuth();
+  const { registerAccount } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -66,8 +66,8 @@ export default function RegisterScreen() {
     }
     setSubmitting(true);
     try {
-      await signUp(name, email, password);
-      refreshProfile();
+      await registerAccount(name, email, password);
+      router.dismissTo({ pathname: '/login', params: { email: email.trim(), registered: String(Date.now()) } });
     } catch (error) {
       setSubmitError(getAuthErrorMessage(error));
       setSubmitting(false);

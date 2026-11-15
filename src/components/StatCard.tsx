@@ -15,7 +15,7 @@ export function StatCard({ label, value, caption, icon: Icon, highlight = false 
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Text style={styles.label} numberOfLines={1}>
+        <Text style={styles.label} numberOfLines={2}>
           {label}
         </Text>
         <View style={styles.icon}>
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
     gap: spacing.sm,
     marginBottom: spacing.xs,

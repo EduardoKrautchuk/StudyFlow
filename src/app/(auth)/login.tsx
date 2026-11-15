@@ -1,4 +1,4 @@
-import { Link } from 'expo-router';
+import { Link, useLocalSearchParams } from 'expo-router';
 import { ArrowRight, BookOpen, Lock, Mail } from 'lucide-react-native';
 import { useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View, type TextInputInstance } from 'react-native';
@@ -22,14 +22,30 @@ type Feedback = {
   message: string;
 };
 
+const registeredFeedback: Feedback = {
+  variant: 'success',
+  title: 'Conta criada!',
+  message: 'Entre com seu e-mail e senha para começar a usar o StudyFlow.',
+};
+
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
+  const params = useLocalSearchParams<{ email?: string; registered?: string }>();
+  const [email, setEmail] = useState(params.email ?? '');
+  const [handledRegistration, setHandledRegistration] = useState(params.registered);
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<LoginErrors>({});
-  const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [feedback, setFeedback] = useState<Feedback | null>(params.registered ? registeredFeedback : null);
   const [submitting, setSubmitting] = useState(false);
   const [sendingReset, setSendingReset] = useState(false);
   const passwordRef = useRef<TextInputInstance>(null);
+
+  if (params.registered && params.registered !== handledRegistration) {
+    setHandledRegistration(params.registered);
+    setEmail(params.email ?? '');
+    setPassword('');
+    setErrors({});
+    setFeedback(registeredFeedback);
+  }
 
   async function handleSubmit() {
     const nextErrors: LoginErrors = {

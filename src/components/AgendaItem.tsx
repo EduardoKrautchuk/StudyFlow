@@ -85,7 +85,7 @@ export function AgendaItem({ activity, subject, todayKey, onPress }: AgendaItemP
       <View style={styles.topRow}>
         <View style={styles.deadline}>
           <DeadlineIcon size={15} color={deadline.color} strokeWidth={2} />
-          <Text style={[styles.deadlineText, { color: deadline.color }]} numberOfLines={1}>
+          <Text style={[styles.deadlineText, { color: deadline.color }]}>
             {deadline.label}
           </Text>
         </View>

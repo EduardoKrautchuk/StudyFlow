@@ -163,12 +163,8 @@ function ActivityForm({ activity, subjects, userId }: ActivityFormProps) {
         <View style={styles.field}>
           <FieldLabel label="Data e horário de entrega" />
           <View style={styles.dateRow}>
-            <View style={styles.dateColumn}>
-              <DatePickerField value={dueDate} onChange={setDueDate} error={Boolean(errors.date)} disabled={saving} />
-            </View>
-            <View style={styles.timeColumn}>
-              <TimePickerField value={dueTime} onChange={setDueTime} disabled={saving} />
-            </View>
+            <DatePickerField value={dueDate} onChange={setDueDate} error={Boolean(errors.date)} disabled={saving} />
+            <TimePickerField value={dueTime} onChange={setDueTime} disabled={saving} />
           </View>
           {errors.date ? (
             <Text style={styles.errorText}>{errors.date}</Text>
@@ -255,14 +251,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   dateRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-  },
-  dateColumn: {
-    flex: 3,
-  },
-  timeColumn: {
-    flex: 2,
+    gap: spacing.sm,
   },
   hint: {
     ...typography.bodySm,
